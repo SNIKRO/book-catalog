@@ -1,7 +1,7 @@
 let faker = require("faker");
 let fileSave = require("fs");
 faker.locale = "ru";
-function createBooks(numbers){
+module.exports.createBooks = function(numbers){
     let books = [];
 
     for(let i = 0; i < numbers; i++){
@@ -18,5 +18,4 @@ function createBooks(numbers){
    }); 
 }
 
-createBooks(5);
 
