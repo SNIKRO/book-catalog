@@ -2,8 +2,7 @@ let faker = require("faker");
 let fs = require("fs");
 faker.locale = "ru";
 function createBooks(numbers){
-    console.log(numbers);
-    
+       
     let books = [];
     
     for(let i = 0; i < numbers; i++){
