@@ -1,9 +1,11 @@
 let faker = require("faker");
-let fileSave = require("fs");
+let fs = require("fs");
 faker.locale = "ru";
-module.exports.createBooks = function(numbers){
+function createBooks(numbers){
+    console.log(numbers);
+    
     let books = [];
-
+    
     for(let i = 0; i < numbers; i++){
         books.push({
             authorName: faker.name.findName(),
@@ -12,10 +14,10 @@ module.exports.createBooks = function(numbers){
             yearOfPublishing: faker.date.past()
             
         });
+        
     }
-   return fileSave.writeFile("books.json", JSON.stringify(books, null, 1), function(err, result){
+   return fs.writeFile("books.json", JSON.stringify(books, null, 1), function(err, result){
        if(err) console.log("error", err);
    }); 
 }
-
-
+createBooks(process.argv[2]);
