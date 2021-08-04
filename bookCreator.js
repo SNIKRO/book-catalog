@@ -11,10 +11,12 @@ function createBooks(numbers){
             desription: faker.lorem.paragraph(),
             yearOfPublishing: faker.date.past()
             
-        })
+        });
     }
    return fileSave.writeFile("books.json", JSON.stringify(books, null, 1), function(err, result){
        if(err) console.log("error", err);
    }); 
 }
+
+createBooks(5);
 
