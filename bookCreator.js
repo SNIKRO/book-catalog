@@ -7,6 +7,7 @@ function createBooks(numbers){
     
     for(let i = 0; i < numbers; i++){
         books.push({
+            id: faker.datatype.number(),
             authorName: faker.name.findName(),
             bookName: faker.lorem.word(),
             desription: faker.lorem.paragraph(),
@@ -15,7 +16,7 @@ function createBooks(numbers){
         });
         
     }
-   return fs.writeFile("books.json", JSON.stringify(books, null, 1), function(err, result){
+    fs.writeFile("books.json", JSON.stringify(books, null, 1), function(err, result){
        if(err) console.log("error", err);
    }); 
 }
