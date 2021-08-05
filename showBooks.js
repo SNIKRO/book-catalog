@@ -4,11 +4,8 @@ const app = express();
 let books = JSON.parse(fs.readFileSync('books.json'));
 
 app.get("/", function(request, response){
-    let bookID = [];
-    books.forEach(book => {
-        bookID.push(book.id);
-    });
-    response.send(bookID);
+   
+    response.send(books);
 
     // let responceBook  = "<ul>";
     // books.forEach(book => {
