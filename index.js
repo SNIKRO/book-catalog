@@ -5,7 +5,7 @@ const app = express();
 const faker = require("faker");
 const e = require("express");
 
-function readMassive(){
+function getData(){
     let books =[];
     try {
         books = JSON.parse(fs.readFileSync('books.json'));
@@ -18,11 +18,11 @@ function readMassive(){
 }
 
 app.get("/books", (request, response) => {
-    response.send(readMassive());
+    response.send(getData());
 });
 
 app.get("/books/:id", (request, response) => {
-    const book = readMassive().find((b) => b.id == request.params.id);
+    const book = getData().find((b) => b.id == request.params.id);
     if(!book){
         response.status(404).send("Книга не найдена");
     }
