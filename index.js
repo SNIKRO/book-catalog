@@ -3,29 +3,35 @@ const express = require("express");
 const { json, request } = require("express");
 const app = express();
 const faker = require("faker");
-let books = [];
+const e = require("express");
 
-app.get("/books", function(request, response){
-    books = JSON.parse(fs.readFileSync('books.json'));   
-    response.send(books);
+function readMassive(){
+    let books =[];
+    try {
+        books = JSON.parse(fs.readFileSync('books.json'));
+        return books;
+        
+    } catch (error) {
+        return undefined;
+    } 
+    
+}
+
+app.get("/books", (request, response) => {
+    response.send(readMassive());
 });
 
-app.get("/books/:id", function(request, response){
-    let message = null;
-    books.forEach(book => {
-        if(book.id == request.params.id){
-         message = book;
-        }
-    });
-    if(message != null){
-        response.send(message);
+app.get("/books/:id", (request, response) => {
+    const book = readMassive().find((b) => b.id == request.params.id);
+    if(!book){
+        response.status(404).send("Книга не найдена");
     }
     else{
-        response.send("Книга не найдена");
+        response.send(book);
     }
 });
 
-app.post("/books", function(request, response){
+app.post("/books", (request, response) =>{
     books.push({
         id: faker.datatype.number(),
         authorName: request.body.name,
