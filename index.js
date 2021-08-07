@@ -1,34 +1,36 @@
 const fs = require("fs");
 const express = require("express");
-const { json, request } = require("express");
 const app = express();
 const faker = require("faker");
-const e = require("express");
 
-function getData(){
-    let books =[];
+
+function getDataMiddleware(request, response, next){
     try {
-        books = JSON.parse(fs.readFileSync('books.json'));
-        return books;
+        let books = JSON.parse(fs.readFileSync('books.json'));
+        request.books = books;
+        next();
         
     } catch (error) {
-        return undefined;
+        console.error(error);
+        response.status(500).send("Проблемы на сервере");
+        
     } 
     
 }
 
+app.use(getDataMiddleware);
+
 app.get("/books", (request, response) => {
-    response.send(getData());
+    response.send(request.books);
 });
 
 app.get("/books/:id", (request, response) => {
-    const book = getData().find((b) => b.id == request.params.id);
+    const book = request.books.find((b) => b.id == request.params.id);
     if(!book){
         response.status(404).send("Книга не найдена");
+        return;
     }
-    else{
-        response.send(book);
-    }
+    response.send(book);
 });
 
 app.post("/books", (request, response) =>{
