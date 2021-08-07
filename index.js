@@ -94,6 +94,27 @@ app.put("/books/:id", (request, response) => {
     });  
 });
 
+app.delete("/books/:id", (request, response) => {
+    const bookIndex = request.books.findIndex((b) => b.id.toString() === request.params.id);
+    if(bookIndex === -1){
+        response.status(404).send("Книга не найдена");
+        return;
+    }
+    request.books.splice(bookIndex,1);
+
+    fs.writeFile("books.json", JSON.stringify(request.books, null, 1), function(err, result){
+        if(err) {
+            console.log("error", err);
+            response.status(500).send("Не удалось удалить книгу");
+            return;
+        };
+        response.sendStatus(200);
+    }); 
+
+    
+
+});
+
 app.listen(3000,undefined,() => {
     console.log("Server is online");
 });
