@@ -4,12 +4,17 @@
   "description": "",
   "main": "test.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon index.js",
+    "generateBooks": "node bookCreator.js 10"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "faker": "^5.5.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
   }
 }

@@ -2,6 +2,7 @@ const fs = require("fs");
 const express = require("express");
 const app = express();
 const faker = require("faker");
+const bodyParser = require("body-parser");
 
 
 function getDataMiddleware(request, response, next){
@@ -17,6 +18,11 @@ function getDataMiddleware(request, response, next){
     } 
     
 }
+
+
+app.use(bodyParser.urlencoded({
+    extended: true
+}))
 
 app.use(getDataMiddleware);
 
@@ -34,16 +40,26 @@ app.get("/books/:id", (request, response) => {
 });
 
 app.post("/books", (request, response) =>{
-    books.push({
+    const book = {
         id: faker.datatype.number(),
         authorName: request.body.name,
         bookName: request.body.book,
-        desription: request.body.descript,
-        yearOfPublishing: request.body.year        
-    });
-    fs.writeFile("books.json", JSON.stringify(books, null, 1), function(err, result){
-        if(err) console.log("error", err);
+        desription: request.body.desription,
+        yearOfPublishing: request.body.year   
+             
+    };
+    request.books.push(book);
+
+    fs.writeFile("books.json", JSON.stringify(request.books, null, 1), function(err, result){
+        if(err) {
+            console.log("error", err);
+            response.status(500).send("Не удалось добавить книгу");
+            return;
+        };
+        response.status(201).send(book);
     });  
 });
 
-app.listen(3000);
+app.listen(3000,undefined,() => {
+    console.log("Server is online");
+});
