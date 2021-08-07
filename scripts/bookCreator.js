@@ -16,7 +16,7 @@ function createBooks(numbers){
         });
         
     }
-    fs.writeFile("books.json", JSON.stringify(books, null, 1), function(err, result){
+    fs.writeFile("./db/books.json", JSON.stringify(books, null, 1), function(err, result){
        if(err) console.log("error", err);
    }); 
 }

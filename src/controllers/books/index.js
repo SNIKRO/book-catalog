@@ -1,30 +1,14 @@
-const fs = require("fs");
-const express = require("express");
-const app = express();
 const faker = require("faker");
-const bodyParser = require("body-parser");
+const express = require("express");
+const fs = require("fs");
+const getDataMiddleware = require("./midllewares/getData");
+const path = require("path");
+const router = express.Router();
+const DB_PATH = path.resolve(process.cwd(), "db/books.json");
 
+router.use(getDataMiddleware);
 
-function getDataMiddleware(request, response, next){
-    try {
-        let books = JSON.parse(fs.readFileSync('books.json'));
-        request.books = books;
-        next();
-        
-    } catch (error) {
-        console.error(error);
-        response.status(500).send("Проблемы на сервере");
-        
-    } 
-    
-}
-app.use(bodyParser.urlencoded({
-    extended: true
-}))
-
-app.use(getDataMiddleware);
-
-app.get("/books", (request, response) => {
+router.get("/", (request, response) => {
     const {
         page = 0,
         perPage = 10
@@ -44,7 +28,7 @@ app.get("/books", (request, response) => {
     });
 });
 
-app.get("/books/:id", (request, response) => {
+router.get("/:id", (request, response) => {
     const book = request.books.find((b) => b.id == request.params.id);
     if(!book){
         response.status(404).send("Книга не найдена");
@@ -53,7 +37,7 @@ app.get("/books/:id", (request, response) => {
     response.send(book);
 });
 
-app.post("/books", (request, response) =>{
+router.post("/", (request, response) =>{
     const book = {
         id: faker.datatype.number(),
         authorName: request.body.name,
@@ -64,7 +48,7 @@ app.post("/books", (request, response) =>{
     };
     request.books.push(book);
 
-    fs.writeFile("books.json", JSON.stringify(request.books, null, 1), function(err, result){
+    fs.writeFile(DB_PATH, JSON.stringify(request.books, null, 1), function(err, result){
         if(err) {
             console.log("error", err);
             response.status(500).send("Не удалось добавить книгу");
@@ -74,7 +58,7 @@ app.post("/books", (request, response) =>{
     });  
 });
 
-app.put("/books/:id", (request, response) => {
+router.put("/:id", (request, response) => {
     const book = request.books.find((b) => b.id == request.params.id);
     if(!book){
         response.status(404).send("Книга не найдена");
@@ -84,7 +68,7 @@ app.put("/books/:id", (request, response) => {
     book.bookName = request.body.book ?? book.bookName;
     book.desription = request.body.desription ?? book.desription;
     book.yearOfPublishing = request.body.year ?? book.yearOfPublishing;
-    fs.writeFile("books.json", JSON.stringify(request.books, null, 1), function(err, result){
+    fs.writeFile(DB_PATH, JSON.stringify(request.books, null, 1), function(err, result){
         if(err) {
             console.log("error", err);
             response.status(500).send("Не удалось обновить книгу");
@@ -94,7 +78,7 @@ app.put("/books/:id", (request, response) => {
     });  
 });
 
-app.delete("/books/:id", (request, response) => {
+router.delete("/:id", (request, response) => {
     const bookIndex = request.books.findIndex((b) => b.id.toString() === request.params.id);
     if(bookIndex === -1){
         response.status(404).send("Книга не найдена");
@@ -102,7 +86,7 @@ app.delete("/books/:id", (request, response) => {
     }
     request.books.splice(bookIndex,1);
 
-    fs.writeFile("books.json", JSON.stringify(request.books, null, 1), function(err, result){
+    fs.writeFile(DB_PATH, JSON.stringify(request.books, null, 1), function(err, result){
         if(err) {
             console.log("error", err);
             response.status(500).send("Не удалось удалить книгу");
@@ -115,6 +99,4 @@ app.delete("/books/:id", (request, response) => {
 
 });
 
-app.listen(3000,undefined,() => {
-    console.log("Server is online");
-});
+module.exports = router;
