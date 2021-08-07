@@ -27,7 +27,23 @@ app.use(bodyParser.urlencoded({
 app.use(getDataMiddleware);
 
 app.get("/books", (request, response) => {
-    response.send(request.books);
+    const {
+        page = 0,
+        perPage = 10
+    } = request.query;
+    const total = request.books.length;
+    const totalPages = Math.ceil(total / perPage);
+    let start = page*perPage;
+    const data = request.books.slice(start,perPage+start);
+    response.send({
+        data,
+        pagination: {
+            page,
+            perPage,
+            total,
+            totalPages
+        }
+    });
 });
 
 app.get("/books/:id", (request, response) => {
