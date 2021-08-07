@@ -18,8 +18,6 @@ function getDataMiddleware(request, response, next){
     } 
     
 }
-
-
 app.use(bodyParser.urlencoded({
     extended: true
 }))
@@ -73,6 +71,26 @@ app.post("/books", (request, response) =>{
             return;
         };
         response.status(201).send(book);
+    });  
+});
+
+app.put("/books/:id", (request, response) => {
+    const book = request.books.find((b) => b.id == request.params.id);
+    if(!book){
+        response.status(404).send("Книга не найдена");
+        return;
+    }
+    book.authorName = request.body.authorName ?? book.authorName;
+    book.bookName = request.body.book ?? book.bookName;
+    book.desription = request.body.desription ?? book.desription;
+    book.yearOfPublishing = request.body.year ?? book.yearOfPublishing;
+    fs.writeFile("books.json", JSON.stringify(request.books, null, 1), function(err, result){
+        if(err) {
+            console.log("error", err);
+            response.status(500).send("Не удалось обновить книгу");
+            return;
+        };
+        response.status(200).send(book);
     });  
 });
 
