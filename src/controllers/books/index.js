@@ -17,15 +17,27 @@ router.get("/", (request, response) => {
     const totalPages = Math.ceil(total / perPage);
     let start = page*perPage;
     const data = request.books.slice(start,perPage+start);
-    response.send({
-        data,
-        pagination: {
-            page,
-            perPage,
-            total,
-            totalPages
+    
+    if (request.query.bookName !== undefined){
+        const book = request.books.find(b => b.bookName === request.query.bookName)
+        if(!book){
+            response.status(404).send("Книга не найдена");
+            return;
         }
-    });
+        response.send(book);
+    }
+    else {
+        response.send(     {
+            data,
+            pagination: {
+                page,
+                perPage,
+                total,
+                totalPages
+            }
+        });
+    }
+    
 });
 
 router.get("/:id", (request, response) => {
@@ -36,6 +48,7 @@ router.get("/:id", (request, response) => {
     }
     response.send(book);
 });
+
 
 router.post("/", (request, response) =>{
     const book = {

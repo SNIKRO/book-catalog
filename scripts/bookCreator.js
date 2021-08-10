@@ -1,3 +1,4 @@
+const { error } = require("console");
 let faker = require("faker");
 let fs = require("fs");
 faker.locale = "ru";
@@ -16,8 +17,18 @@ function createBooks(numbers){
         });
         
     }
-    fs.writeFile("./db/books.json", JSON.stringify(books, null, 1), function(err, result){
-       if(err) console.log("error", err);
-   }); 
+    fs.stat('./db', function(erorr){
+        if(!erorr){
+            fs.writeFile("./db/books.json", JSON.stringify(books, null, 1), function(err, result){
+                if(err) console.log("error", err);
+            });
+        }
+        else if(erorr.code === "ENOENT"){
+          fs.mkdirSync('./db');    
+          fs.writeFile("./db/books.json", JSON.stringify(books, null, 1), function(err, result){
+            if(err) console.log("error", err);
+        });
+        }
+    }); 
 }
 createBooks(process.argv[2]);
