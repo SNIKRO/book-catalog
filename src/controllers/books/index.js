@@ -18,13 +18,21 @@ router.get("/", (request, response) => {
     let start = page*perPage;
     const data = request.books.slice(start,perPage+start);
     
-    if (request.query.bookName !== undefined){
-        const book = request.books.find(b => b.bookName === request.query.bookName)
-        if(!book){
+    if (request.query.search !== undefined){
+        const searchBooks = request.books.filter(b => b.bookName.indexOf(request.query.search) > -1);
+        if(!searchBooks){
             response.status(404).send("Книга не найдена");
             return;
         }
-        response.send(book);
+        response.send(     {
+            searchBooks,
+            pagination: {
+                page,
+                perPage,
+                total,
+                totalPages
+            }
+        });
     }
     else {
         response.send(     {
@@ -55,7 +63,7 @@ router.post("/", (request, response) =>{
         id: faker.datatype.number(),
         authorName: request.body.name,
         bookName: request.body.book,
-        desription: request.body.desription,
+        description: request.body.description,
         yearOfPublishing: request.body.year   
              
     };
@@ -79,7 +87,7 @@ router.put("/:id", (request, response) => {
     }
     book.authorName = request.body.authorName ?? book.authorName;
     book.bookName = request.body.book ?? book.bookName;
-    book.desription = request.body.desription ?? book.desription;
+    book.description = request.body.description ?? book.description;
     book.yearOfPublishing = request.body.year ?? book.yearOfPublishing;
     fs.writeFile(DB_PATH, JSON.stringify(request.books, null, 1), function(err, result){
         if(err) {
@@ -107,8 +115,6 @@ router.delete("/:id", (request, response) => {
         };
         response.sendStatus(200);
     }); 
-
-    
 
 });
 
