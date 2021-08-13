@@ -3,7 +3,6 @@ const express = require("express");
 const fs = require("fs");
 const getDataMiddleware = require("./midllewares/getData");
 const path = require("path");
-const { serialize } = require("v8");
 const router = express.Router();
 const DB_PATH = path.resolve(process.cwd(), "db/books.json");
 
@@ -17,38 +16,23 @@ router.get("/", (request, response) => {
     const total = request.books.length;
     const totalPages = Math.ceil(total / perPage);
     let start = page*perPage;
-    const data = request.books.slice(start,perPage+start);
+    let data = request.books.slice(start,perPage+start);
     
     if (request.query.search !== undefined){
         const searchBooks = request.books.filter(b => b.bookName.toLowerCase().includes(request.query.search.toLowerCase()));
-        if(searchBooks.length === 0 || !searchBooks){
-            response.status(404).send("Книга не найдена");
-            return;
-        }
-        let paginationSearchBooks = searchBooks.slice(start,perPage+start);
-        response.send(     {
-            paginationSearchBooks,
-            pagination: {
-                page,
-                perPage,
-                total,
-                totalPages
-            }
-        });
-    }
-    else {
-        response.send(     {
-            data,
-            pagination: {
-                page,
-                perPage,
-                total,
-                totalPages
-            }
-        });
+        data = searchBooks.slice(start,perPage+start);
     }
     
-});
+    response.send(     {
+        data,
+        pagination: {
+            page,
+            perPage,
+            total,
+            totalPages
+            }
+        });
+    });
 
 router.get("/:id", (request, response) => {
     const book = request.books.find((b) => b.id == request.params.id);
