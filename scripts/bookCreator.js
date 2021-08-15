@@ -10,14 +10,20 @@ function createBooks(numbers){
             id: faker.datatype.number(),
             authorName: faker.name.findName(),
             bookName: faker.lorem.word(),
-            desription: faker.lorem.paragraph(),
+            descriptions: faker.lorem.paragraph(),
             yearOfPublishing: faker.date.past()
             
         });
         
     }
-    fs.writeFile("./db/books.json", JSON.stringify(books, null, 1), function(err, result){
-       if(err) console.log("error", err);
-   }); 
+    fs.stat('./db', function(error){
+        if(error.code === "ENOENT"){
+            fs.mkdirSync('./db');    
+        }  
+        fs.writeFile("./db/books.json", JSON.stringify(books, null, 1), function(err, result){
+            if(err) console.log("error", err);
+        });
+        
+    }); 
 }
 createBooks(process.argv[2]);

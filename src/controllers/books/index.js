@@ -16,17 +16,23 @@ router.get("/", (request, response) => {
     const total = request.books.length;
     const totalPages = Math.ceil(total / perPage);
     let start = page*perPage;
-    const data = request.books.slice(start,perPage+start);
-    response.send({
+    let data = request.books.slice(start,perPage+start);
+    
+    if (request.query.search !== undefined){
+        const searchBooks = request.books.filter(b => b.bookName.toLowerCase().includes(request.query.search.toLowerCase()));
+        data = searchBooks.slice(start,perPage+start);
+    }
+    
+    response.send(     {
         data,
         pagination: {
             page,
             perPage,
             total,
             totalPages
-        }
+            }
+        });
     });
-});
 
 router.get("/:id", (request, response) => {
     const book = request.books.find((b) => b.id == request.params.id);
@@ -37,12 +43,13 @@ router.get("/:id", (request, response) => {
     response.send(book);
 });
 
+
 router.post("/", (request, response) =>{
     const book = {
         id: faker.datatype.number(),
         authorName: request.body.name,
         bookName: request.body.book,
-        desription: request.body.desription,
+        description: request.body.description,
         yearOfPublishing: request.body.year   
              
     };
@@ -66,7 +73,7 @@ router.put("/:id", (request, response) => {
     }
     book.authorName = request.body.authorName ?? book.authorName;
     book.bookName = request.body.book ?? book.bookName;
-    book.desription = request.body.desription ?? book.desription;
+    book.description = request.body.description ?? book.description;
     book.yearOfPublishing = request.body.year ?? book.yearOfPublishing;
     fs.writeFile(DB_PATH, JSON.stringify(request.books, null, 1), function(err, result){
         if(err) {
@@ -94,8 +101,6 @@ router.delete("/:id", (request, response) => {
         };
         response.sendStatus(200);
     }); 
-
-    
 
 });
 
